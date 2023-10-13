@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+set -e
 if  [[ ! -x "$(command -v redis-cli)" ]]
 then
 	echo "redis-cli could not be found"
@@ -24,7 +24,7 @@ key=""
 
 while [ "$1" != "" ]; do
     case $1 in
-        -s | --host )         	shift; host=$1;;
+        -h | --host )         	shift; host=$1;;
 		-P | --port )         	shift; port=$1;;
         -k | --key )      		shift; key=$1;; 			
         * | help)               m_usage; exit 1
@@ -66,10 +66,7 @@ then
 	else
 		result=$(redis-cli --raw $server $command 2>/dev/null)
 		echo $result
-	fi	
-	
-	result=$(redis-cli --raw $server $command 2>/dev/null)
-	echo $result
+	fi		
 else
 	echo "$server cannot connect"
 fi

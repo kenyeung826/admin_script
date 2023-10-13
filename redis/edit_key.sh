@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+set -e
 if  [[ ! -x "$(command -v redis-cli)" ]]
 then
 	echo "redis-cli could not be found"
@@ -26,7 +26,7 @@ value=""
 
 while [ "$1" != "" ]; do
     case $1 in
-        -s | --host )         	shift; host=$1;;
+        -h | --host )         	shift; host=$1;;
 		-P | --port )         	shift; port=$1;;
         -k | --key )      		shift; key=$1;; 			
 		-v | --value )			shift; value=$1;;
