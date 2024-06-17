@@ -1,0 +1,233 @@
+set encoding=utf-8
+set t_Co=256
+source ~/ken/vim/colors/darcula.vim 
+
+
+"=====[ Avoid modeline vulnerability ]===========================
+set nomodeline
+
+"=====[ Convert to Unicode defaults ]===============================
+
+setglobal termencoding=utf-8 fileencodings=
+scriptencoding utf-8
+set encoding=utf-8
+
+autocmd BufNewFile,BufRead  *   try
+autocmd BufNewFile,BufRead  *   set encoding=utf-8
+autocmd BufNewFile,BufRead  *   endtry
+
+"=====[ Tab handling ]======================================
+"
+set tabstop=4      "Tab indentation levels every four columns
+set shiftwidth=4   "Indent/outdent by four columns
+set expandtab      "Convert all tabs that are typed into spaces
+set shiftround     "Always indent/outdent to nearest tabstop
+set smarttab       "Use shiftwidths at left margin, tabstops everywhere else
+"
+"" Make the completion popup look menu-ish on a Mac...
+highlight  Pmenu        ctermbg=white   ctermfg=black
+highlight  PmenuSel     ctermbg=blue    ctermfg=white   cterm=bold
+highlight  PmenuSbar    ctermbg=grey    ctermfg=grey
+highlight  PmenuThumb   ctermbg=blue    ctermfg=blue
+
+" Make diffs less glaringly ugly...
+highlight DiffAdd     cterm=bold ctermfg=green     ctermbg=black
+highlight DiffChange  cterm=bold ctermfg=grey      ctermbg=black
+highlight DiffDelete  cterm=bold ctermfg=black     ctermbg=black
+highlight DiffText    cterm=bold ctermfg=magenta   ctermbg=black
+
+"=======[ Indentation ]============
+"
+set autoindent                     "Retain indentation on next line
+filetype plugin indent on
+
+augroup FiletypeInference
+    autocmd!
+    autocmd BufNewFile,BufRead  *.phtml	setfiletype php
+augroup END
+
+"=====[ Comments are important ]==================
+
+highlight Comment term=bold cterm=italic ctermfg=white gui=italic guifg=white
+
+
+"=====[ Some of Vim's defaults are just annoying ]============
+
+" :read and :write shouldn't set #
+set cpo-=aA
+
+" Join lines with a single space only (even after sentence terminators)
+set nojoinspaces
+
+
+"=====[ Make diffs better ]=====================
+
+" Prefer vertical orientation when using :diffsplit
+set diffopt+=vertical
+
+" No | in the vertical separator
+set fillchars=vert:\ ,fold:-
+
+" Use a smarter diff, if available...
+if has('nvim-0.3.2') || has("patch-8.1.0360")
+    set diffopt=vertical,filler,internal,algorithm:histogram,indent-heuristic
+endif
+
+
+"====[ Toggle visibility of naughty characters ]============
+
+" Make naughty characters visible...
+" set lcs=tab:══»,trail:␣,nbsp:˷
+"   Tabs	shown	thusly	and	so
+"   Trailing whitespace    
+"   Non-breaking space
+
+highlight InvisibleSpaces ctermfg=Black ctermbg=Black
+call matchadd('InvisibleSpaces', '\S\@<=\s\+\%#\ze\s*$')
+
+
+"====[ Set up smarter search behaviour ]=======================
+
+set incsearch       "Lookahead as search pattern is specified
+set ignorecase      "Ignore case in all searches...
+set smartcase       "...unless uppercase letters used
+
+set hlsearch        "Highlight all matches
+highlight clear Search
+highlight       Search    ctermfg=White  ctermbg=Black  cterm=bold
+highlight    IncSearch    ctermfg=White  ctermbg=Red    cterm=bold
+
+
+"====[ Set background hint (if possible) ]=============
+
+"if $VIMBACKGROUND != ""
+"    exec 'set background=' . $VIMBACKGROUND
+"else
+"    set background=dark
+"endif
+
+set background=dark
+
+
+"=====[ Enable smartwrapping ]==================================
+
+" No smartwrapping in any of these files...
+"let g:SW_IGNORE_FILES = '.vimrc,*.vim,*.pl,*.pm,**/bin/**'
+
+set wrapmargin=2                            "Wrap 2 characters from the edge of the window
+"set cinwords = ""                           "But not for C-like keywords
+set cinoptions+=#1
+set cinkeys-=0#
+
+
+"=======[ Select formatting options explicitly ]=========================
+
+set formatoptions=tnbl1jcro
+
+" t : Auto-wrap text using textwidth.
+" n : When formatting text, recognize numbered lists.
+" b : Only auto-wrap if you enter a blank at or before the wrap margin.
+" l : Already long lines are not broken in insert mode.
+" 1 : Don't break a line after a one-letter word.
+" j : Remove a comment leader when joining lines.
+" c : Auto-wrap comments using textwidth, inserting the current comment leader automatically.
+" r : Automatically insert the current comment leader after hitting <Enter> in Insert mode.
+" o : Automatically insert the current comment leader after hitting 'o' or 'O' in Normal mode.
+
+function! BufSetFOA ()
+"    if empty(&filetype) || &filetype == 'text'
+"        set formatoptions+=a
+"        set textwidth=79
+"    endif
+endfunction
+
+" Turn on autoreformating of paragraphs in text files...
+augroup Autoreindent
+    autocmd!
+    autocmd BufReadPost   *      call BufSetFOA()
+augroup END
+
+"====[ I hate modelines ]===================
+
+set modelines=0
+
+"=====[ Miscellaneous features (mainly options) ]=====================
+
+set title           "Show filename in titlebar of window
+set titleold=
+"set titlestring=%t%(\ %M%)%(\ (%{expand(\"%:~:.:h\")})%)%(\ %a%)
+set title titlestring=
+
+set nomore          "Don't page long listings
+
+set cpoptions-=a    "Don't set # after a :read
+
+set autowrite       "Save buffer automatically when changing files
+set autoread        "Always reload buffer when external changes detected
+
+"           +--Disable hlsearch while loading viminfo
+"           | +--Remember marks for last 500 files
+"           | |    +--Remember up to 10000 lines in each register
+"           | |    |      +--Remember up to 1MB in each register
+"           | |    |      |     +--Remember last 1000 search patterns
+"           | |    |      |     |     +---Remember last 1000 commands
+"           | |    |      |     |     |
+"           v v    v      v     v     v
+set viminfo=h,'500,<10000,s1000,/1000,:1000
+
+set backspace=indent,eol,start      "BS past autoindents, line boundaries,
+                                    "     and even the start of insertion
+
+set fileformats=unix,mac,dos        "Handle Mac and DOS line-endings
+                                    "but prefer Unix endings
+
+set wildignorecase                  "Case-insensitive completions
+
+set wildmode=list:longest,full      "Show list of completions
+                                    "  and complete as much as possible,
+                                    "  then iterate full completions
+
+set complete-=t                     " I don't use tags, so no need to search for them
+
+set infercase                       "Adjust completions to match case
+
+"set noshowmode                      "Suppress mode change messages
+
+set updatecount=10                  "Save buffer every 10 chars typed
+
+
+" Keycodes and maps timeout in 3/10 sec...
+set timeout timeoutlen=300 ttimeoutlen=300
+
+" "idleness" is 0.5 sec
+set updatetime=500
+
+set scrolloff=2                     "Scroll when 3 lines from top/bottom
+
+"=====[ General programming support ]===================================
+"Insert various shebang lines...
+iab hbc #! /bin/csh
+iab hbs #! /bin/sh
+iab hbp #! /usr/bin/env polyperl<CR>use 5.020;<CR>use warnings;<CR>use experimentals;<CR>
+iab hbr #! /usr/bin/env raku<CR>use v6;
+
+
+"======[ Breakindenting ]========
+
+" set breakindentopt=shift:2,sbr
+set showbreak=↪
+"set breakindent
+set linebreak
+
+"=======[ Prettier tabline ]============================================
+
+highlight Tabline      cterm=underline       ctermfg=40     ctermbg=22
+highlight TablineSel   cterm=underline,bold  ctermfg=white  ctermbg=28
+highlight TablineFill  cterm=NONE            ctermfg=black  ctermbg=black
+
+"=======[ Set Number ]============================================
+set number
+
+"=======[ add plugin ]============================================
+" packadd editorconfig 
+source ~/ken/vim/plugin/editorconfig.vim
